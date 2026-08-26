@@ -1,0 +1,256 @@
+import asyncio
+import discord
+from discord.ext import commands
+import random
+import os
+import requests
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+# Importar pass_gen do bot_logic.py  
+from geradorsenha import pass_gen
+
+# A variável intents armazena as permissões do bot
+intents = discord.Intents.default()
+# Ativar a permissão para ler o conteúdo das mensagens
+intents.message_content = True
+# Criar um bot e passar as permissões
+bot = commands.Bot(command_prefix='$', intents=intents)
+
+#tarefas basicas do bot
+
+#login do bot
+@bot.event
+async def on_ready():
+    print(f'Fizemos login como {bot.user}')
+
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        await ctx.send("❌ Comando não encontrado. Use `$ajuda` para ver os comandos disponíveis.")
+    elif isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send("❌ Argumento ausente. Verifique o comando e tente novamente.")
+    elif isinstance(error, commands.BadArgument):
+        await ctx.send("❌ Argumento inválido. Verifique o comando e tente novamente.")
+    else:
+        await ctx.send(f"❌ Ocorreu um erro: {str(error)}")
+
+
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+
+    # Verifica se a mensagem contém a palavra "bot"
+    if "bot" in message.content.lower():
+        await message.channel.send("Olá! Eu sou o bot do servidor. Use `$ajuda` para ver os comandos disponíveis.")
+
+    await bot.process_commands(message)
+
+#hello
+@bot.command()
+async def hello(ctx):
+    await ctx.send("Hello!")
+
+
+#bye
+@bot.command()
+async def bye(ctx):
+    await ctx.send("\U0001f642")
+
+@bot.command()
+async def ajuda(ctx):
+    await ctx.send("Olá! Eu sou o bot do servidor. Aqui estão alguns comandos que você pode usar:\n"
+                   "tarefas basicas do bot\n"
+                    "1. `$hello` - O bot responde com 'Hello!'\n"
+                    "2. `$bye` - O bot responde com um emoji sorridente.\n"
+                    "3. `$ajuda` - Mostra esta mensagem de ajuda.\n"
+                    "4. `$clear <quantidade>` - Apaga a quantidade de mensagens especificada (requer permissão de gerenciar mensagens).\n"
+                    "8. `$poke` - Mostra um Pokémon aleatório da 1ª geração.\n"
+                    "12. `$forca` - Inicia um jogo da forca.\n"
+                    "tarefas do bot com emojis, gifs e memes\n"
+                    "15. `$meme` - Mostra um meme aleatório.\n"
+                    "16. `$animals` - Mostra um meme de animal aleatório.\n"
+                    "17. `$gif`, `$gif2`, `$gif3`, `$gif4`, `$gif5` - Mostra gifs aleatórios.\n"
+                    "18. `$emoji1`, `$emoji2`, `$emoji3`, `$emoji4`, `$emoji5` - Mostra emojis aleatórios.\n"
+                   "Divirta-se!")
+
+
+#limpar mensagens
+@bot.command()
+@commands.has_permissions(manage_messages=True)
+async def clear(ctx, quantidade: int):
+    if quantidade <= 0:
+        await ctx.send("❌ Use um número maior que 0.")
+        return
+
+    # +1 para apagar a mensagem do comando também
+    apagadas = await ctx.channel.purge(limit=quantidade + 1)
+
+    msg = await ctx.send(f"🧹 {len(apagadas) - 1} mensagens apagadas com sucesso!")
+    # Apaga a mensagem de confirmação depois de 5 segundos
+    await msg.delete(delay=5)
+
+@clear.error
+async def clear_error(ctx, error):
+    if isinstance(error, commands.MissingPermissions):
+        await ctx.send("❌ Você não tem permissão para usar esse comando.")
+    elif isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send("❌ Use: `$clear <quantidade>`")
+    elif isinstance(error, commands.BadArgument):
+        await ctx.send("❌ A quantidade precisa ser um número.")
+
+#pokémon aleatório
+def get_poke_image_url():
+    poke_id = random.randint(1, 151)  # Pokémon da 1ª geração
+    url = f'https://pokeapi.co/api/v2/pokemon/{poke_id}'
+
+    res = requests.get(url)
+    data = res.json()
+
+    # pega a imagem do Pokémon
+    image_url = data['sprites']['front_default']
+    nome = data['name'].capitalize()
+
+    return nome, image_url
+
+
+@bot.command('poke')
+async def poke(ctx):
+    nome, image_url = get_poke_image_url()
+    await ctx.send(f"⚡ Pokémon sorteado: **{nome}**")
+    await ctx.send(image_url)
+
+#jogo da forca
+@bot.command()
+async def forca(ctx):
+    palavras = ["python", "discord", "programacao", "bot", "jogo"]
+    palavra = random.choice(palavras)
+    letras_descobertas = ["_"] * len(palavra)
+    tentativas = 6
+
+    await ctx.send(f"Jogo da forca iniciado! A palavra tem {len(palavra)} letras.\n"
+                   f"{' '.join(letras_descobertas)}\n"
+                   f"Você tem {tentativas} tentativas.")
+
+    def check(m):
+        return m.author == ctx.author and len(m.content) == 1 and m.content.isalpha()
+
+    while tentativas > 0 and "_" in letras_descobertas:
+        try:
+            msg = await bot.wait_for('message', check=check, timeout=30.0)
+            letra = msg.content.lower()
+
+            if letra in palavra:
+                for i, l in enumerate(palavra):
+                    if l == letra:
+                        letras_descobertas[i] = letra
+                await ctx.send(f"✅ Letra correta!\n{' '.join(letras_descobertas)}")
+            else:
+                tentativas -= 1
+                await ctx.send(f"❌ Letra incorreta! Tentativas restantes: {tentativas}")
+
+        except asyncio.TimeoutError:
+            await ctx.send("⏰ Tempo esgotado! O jogo terminou.")
+            return
+
+    if "_" not in letras_descobertas:
+        await ctx.send(f"🎉 Parabéns! Você adivinhou a palavra: **{palavra}**")
+    else:
+        await ctx.send(f"💀 Você perdeu! A palavra era: **{palavra}**")
+
+
+#tarefas do bot com emojis, gifs e memes
+
+#memes aleatórios
+@bot.command()
+async def meme(ctx):
+    pasta = os.path.join(BASE_DIR, "memes")
+
+    if not os.path.exists(pasta):
+        await ctx.send(f"❌ Pasta não encontrada:\n{pasta}")
+        return
+
+    arquivos = [
+        f for f in os.listdir(pasta)
+        if os.path.isfile(os.path.join(pasta, f))
+    ]
+
+    if not arquivos:
+        await ctx.send("❌ Não há memes na pasta.")
+        return
+
+    arquivo = random.choice(arquivos)
+    caminho = os.path.join(pasta, arquivo)
+
+    await ctx.send(file=discord.File(caminho))
+
+
+#memes de animais aleatórios
+@bot.command()
+async def animals(ctx):
+    pasta = os.path.join(BASE_DIR, "memes", "animals")
+
+    if not os.path.exists(pasta):
+        await ctx.send(f"❌ Pasta não encontrada:\n{pasta}")
+        return
+
+    arquivos = [
+        f for f in os.listdir(pasta)
+        if os.path.isfile(os.path.join(pasta, f))
+    ]
+    
+    if not arquivos:
+        await ctx.send("❌ Não encontrei memes de animais.")
+        return
+
+    arquivo = random.choice(arquivos)
+    caminho = os.path.join(pasta, arquivo)
+
+    await ctx.send(file=discord.File(caminho))
+
+
+#gif de 1 ao 5
+@bot.command()
+async def gif(ctx):
+    await ctx.send("https://tenor.com/view/marceline-bubbline-adventure-time-princess-bubblegum-best-friends-gif-14213958")
+
+@bot.command()
+async def gif2(ctx):
+    await ctx.send("https://klipy.com/gifs/spongebob-spongebob-squarepants-249")
+
+@bot.command()
+async def gif3(ctx):
+    await ctx.send("https://klipy.com/gifs/snoopy-dance-celebrate")
+
+@bot.command()
+async def gif4(ctx):
+    await ctx.send("https://klipy.com/gifs/spider-man-x-men-97")
+
+@bot.command()
+async def gif5(ctx):
+    await ctx.send("https://klipy.com/gifs/x-men-97-23")
+
+
+#emoji de 1 ao 5
+@bot.command()
+async def emoji1(ctx):
+    await ctx.send("🎮")
+
+@bot.command()
+async def emoji2(ctx):
+    await ctx.send("🕹️")
+
+@bot.command()
+async def emoji3(ctx):
+    await ctx.send("👾")
+
+@bot.command()
+async def emoji4(ctx):
+    await ctx.send("🎧")
+
+@bot.command()
+async def emoji5(ctx):
+    await ctx.send("🎸")
