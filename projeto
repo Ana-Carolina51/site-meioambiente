@@ -49,34 +49,41 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-#hello
-@bot.command()
-async def hello(ctx):
-    await ctx.send("Hello!")
-
-
-#bye
-@bot.command()
-async def bye(ctx):
-    await ctx.send("\U0001f642")
-
 @bot.command()
 async def ajuda(ctx):
-    await ctx.send("Olá! Eu sou o bot do servidor. Aqui estão alguns comandos que você pode usar:\n"
+    await ctx.send("Olá! Eu sou o BioBot.Um bot criado para ajudar você com as mudanças climaticas. Aqui estão alguns comandos que você pode usar:\n"
                    "tarefas basicas do bot\n"
-                    "1. `$hello` - O bot responde com 'Hello!'\n"
-                    "2. `$bye` - O bot responde com um emoji sorridente.\n"
+                    "1. `$bemvindo` - O bot responde com uma breve explicação sobre a sua função.\n"
+                    "2. `$atelogo` - O bot responde com uma mensagem de despedida.\n"
                     "3. `$ajuda` - Mostra esta mensagem de ajuda.\n"
                     "4. `$clear <quantidade>` - Apaga a quantidade de mensagens especificada (requer permissão de gerenciar mensagens).\n"
-                    "8. `$poke` - Mostra um Pokémon aleatório da 1ª geração.\n"
-                    "12. `$forca` - Inicia um jogo da forca.\n"
+                    "5. `$climatica` - Mostra informações sobre as mudanças climáticas.\n" \
+                    "6. `$problema` - Mostra informações sobre o problema das mudanças climáticas.\n" \
+                    "7. `$causas` - Mostra informações sobre as causas das mudanças climáticas.\n" \
+                    "8. `$consequencias` - Mostra informações sobre as consequências das mudanças climáticas.\n" \
+                    "9. `$energias` - Mostra informações sobre energias renováveis.\n" \
+                    "10. `$florestas` - Mostra informações sobre a proteção e restauração de florestas.\n" \
+                    "11. `$agricultura` - Mostra informações sobre práticas agrícolas sustentáveis.\n" \
+                    "12. `$politicas` - Mostra informações sobre políticas públicas para mitigar as mudanças climáticas.\n" \
+                    "13. `$reciclagem` - Mostra informações sobre reciclagem.\n" \
+                    "14. `$lixo` - Mostra informações sobre como separar o lixo corretamente.\n" \
+                    "15. `$forca` - Inicia um jogo da forca com palavras relacionadas às mudanças climáticas.\n"
                     "tarefas do bot com emojis, gifs e memes\n"
-                    "15. `$meme` - Mostra um meme aleatório.\n"
-                    "16. `$animals` - Mostra um meme de animal aleatório.\n"
+                    "16. `$meme` - Mostra um meme aleatório sobre as mudanças climáticas.\n"
                     "17. `$gif`, `$gif2`, `$gif3`, `$gif4`, `$gif5` - Mostra gifs aleatórios.\n"
                     "18. `$emoji1`, `$emoji2`, `$emoji3`, `$emoji4`, `$emoji5` - Mostra emojis aleatórios.\n"
                    "Divirta-se!")
 
+
+#boas vindas do bot
+@bot.command()
+async def bemvindo(ctx):
+    await ctx.send("Seja bem vindo ao BioBot, aqui terá algumas dicas e informações que podem te ajudar a entender melhor sobre as mudanças climáticas e como podemos ajudar o planeta.")
+
+#despedida do bot   
+@bot.command()
+async def atelogo(ctx):
+    await ctx.send("Obrigado por usar o BioBot! Espero que tenha gostado e aprendido mais sobre as mudanças climáticas! Até logo!😊")
 
 #limpar mensagens
 @bot.command()
@@ -102,31 +109,101 @@ async def clear_error(ctx, error):
     elif isinstance(error, commands.BadArgument):
         await ctx.send("❌ A quantidade precisa ser um número.")
 
-#pokémon aleatório
-def get_poke_image_url():
-    poke_id = random.randint(1, 151)  # Pokémon da 1ª geração
-    url = f'https://pokeapi.co/api/v2/pokemon/{poke_id}'
+#informações sobre mudanças climáticas
+@bot.command()
+async def climatica(ctx):
+    await ctx.send("As mudanças climáticas são alterações significativas no clima global que afetam o ecossistema e a vida na Terra. Digite `$problema` para entender melhor o porque a mudança climatica e um problema.")
 
-    res = requests.get(url)
-    data = res.json()
+@bot.command()
+async def problema(ctx):
+    await ctx.send("O problema das mudanças climáticas é que elas podem causar eventos climáticos extremos, como furacões, secas e inundações, além de afetar a biodiversidade, a agricultura e a saúde humana. É um desafio global que requer ação imediata para mitigar seus efeitos.")
 
-    # pega a imagem do Pokémon
-    image_url = data['sprites']['front_default']
-    nome = data['name'].capitalize()
+@bot.command()
+async def causas(ctx):
+    await ctx.send("As causas das mudanças climáticas são principalmente relacionadas às atividades humanas, como a queima de combustíveis fósseis, o desmatamento e a agricultura intensiva, que liberam grandes quantidades de gases de efeito estufa na atmosfera.")
 
-    return nome, image_url
+@bot.command()
+async def combustiveis(ctx):
+    await ctx.send("Combustíveis fósseis são fontes de energia não renováveis, como carvão, petróleo e gás natural, que liberam grandes quantidades de CO2 quando queimados, contribuindo para o aquecimento global.")
 
+@bot.command()
+async def desmatamento(ctx):
+    await ctx.send("O desmatamento é a remoção de florestas para dar lugar a atividades humanas, como agricultura e urbanização. Isso contribui para a perda de biodiversidade e aumenta as emissões de gases de efeito estufa.")
 
-@bot.command('poke')
-async def poke(ctx):
-    nome, image_url = get_poke_image_url()
-    await ctx.send(f"⚡ Pokémon sorteado: **{nome}**")
-    await ctx.send(image_url)
+#como conter as mudanças climáticas
+
+@bot.command()
+async def conter(ctx):
+    await ctx.send("Para conter as mudanças climáticas, é importante:\n"
+                   "1. Reduzir a emissão de gases de efeito estufa.\n"
+                   "2. Promover o uso de energias renováveis.\n"
+                   "3. Proteger e restaurar florestas e ecossistemas.\n"
+                   "4. Incentivar práticas agrícolas sustentáveis.\n"
+                   "5. Implementar políticas públicas eficazes para a mitigação das mudanças climáticas.")
+
+@bot.command()
+async def gases(ctx):
+    await ctx.send("Para reduzir a emissão de gases de efeito estufa, podemos:\n"
+                   "1. Reduzir o consumo de energia e água.\n"
+                   "2. Utilizar transportes sustentáveis.\n"
+                   "3. Adotar práticas agrícolas e industriais mais eficientes.\n"
+                   "4. Investir em tecnologias limpas e renováveis.")
+
+@bot.command()
+async def energias(ctx):
+    await ctx.send("Para promover o uso de energias renováveis, podemos:\n"
+                   "1. Investir em energia solar, eólica e hidrelétrica.\n"
+                   "2. Incentivar a pesquisa e desenvolvimento de novas tecnologias de energia limpa.\n"
+                   "3. Implementar políticas de incentivo à adoção de energias renováveis.\n"
+                   "4. Reduzir a dependência de combustíveis fósseis.")
+
+@bot.command()
+async def florestas(ctx):   
+    await ctx.send("Para proteger e restaurar florestas e ecossistemas, podemos:\n"
+                   "1. Implementar políticas de conservação ambiental.\n"
+                   "2. Promover o reflorestamento e a recuperação de áreas degradadas.\n"
+                   "3. Incentivar práticas de manejo sustentável das florestas.\n"
+                   "4. Apoiar comunidades locais na preservação de seus recursos naturais.")
+
+@bot.command()
+async def agricultura(ctx):
+    await ctx.send("Para incentivar práticas agrícolas sustentáveis, podemos:\n"
+                   "1. Reduzir o uso de pesticidas e fertilizantes químicos.\n"
+                   "2. Adotar técnicas de agricultura orgânica e agroecológica.\n"
+                   "3. Implementar sistemas de rotação de culturas e plantio direto.\n"
+                   "4. Promover a conservação do solo e da água.")
+
+@bot.command()
+async def politicas(ctx):
+    await ctx.send("Para implementar políticas públicas eficazes para a mitigação das mudanças climáticas, podemos:\n"
+                   "1. Estabelecer metas de redução de emissões de gases de efeito estufa.\n"
+                   "2. Criar incentivos fiscais para empresas que adotem práticas sustentáveis.\n"
+                   "3. Investir em educação ambiental e conscientização pública.\n"
+                   "4. Colaborar com outros países em acordos internacionais sobre mudanças climáticas.")
+
+    
+@bot.command()
+async def reciclagem(ctx):
+    await ctx.send("A reciclagem é o processo de transformar materiais usados em novos produtos, reduzindo a necessidade de recursos naturais e diminuindo a quantidade de lixo. Exemplos incluem reciclar papel, plástico, vidro e metais. Digite $lixo para saber mais sobre como separar o lixo corretamente.")
+
+@bot.command()
+async def lixo(ctx):
+    await ctx.send("Separar o lixo corretamente é essencial para a reciclagem e a preservação do meio ambiente. Aqui estão algumas dicas:\n"
+                   "1. Separe o lixo em categorias: orgânico, reciclável e rejeito.\n"
+                   "2. Lave os recipientes recicláveis antes de descartá-los.\n"
+                   "3. Não misture materiais diferentes na mesma lixeira.\n"
+                   "4. Verifique as regras de coleta seletiva da sua cidade.\n"
+                   "5. lixeira amarela: papel e papelão.\n"
+                   "6. lixeira azul: plástico.\n"
+                   "7. lixeira verde: vidro.\n"
+                   "8. lixeira vermelha: metais.\n"
+                   "9. lixeira marrom: orgânicos.\n"
+                   "10. Reduza o uso de produtos descartáveis e opte por reutilizáveis sempre que possível.")
 
 #jogo da forca
 @bot.command()
 async def forca(ctx):
-    palavras = ["python", "discord", "programacao", "bot", "jogo"]
+    palavras = ["Aquecimento global", "Efeito estufa", "Crise climática", "Combustíveis fósseis", "Desmatamento"]
     palavra = random.choice(palavras)
     letras_descobertas = ["_"] * len(palavra)
     tentativas = 6
@@ -164,7 +241,7 @@ async def forca(ctx):
 
 #tarefas do bot com emojis, gifs e memes
 
-#memes aleatórios
+#memes sobre o meio ambiente
 @bot.command()
 async def meme(ctx):
     pasta = os.path.join(BASE_DIR, "memes")
@@ -187,70 +264,47 @@ async def meme(ctx):
 
     await ctx.send(file=discord.File(caminho))
 
-
-#memes de animais aleatórios
-@bot.command()
-async def animals(ctx):
-    pasta = os.path.join(BASE_DIR, "memes", "animals")
-
-    if not os.path.exists(pasta):
-        await ctx.send(f"❌ Pasta não encontrada:\n{pasta}")
-        return
-
-    arquivos = [
-        f for f in os.listdir(pasta)
-        if os.path.isfile(os.path.join(pasta, f))
-    ]
-    
-    if not arquivos:
-        await ctx.send("❌ Não encontrei memes de animais.")
-        return
-
-    arquivo = random.choice(arquivos)
-    caminho = os.path.join(pasta, arquivo)
-
-    await ctx.send(file=discord.File(caminho))
-
-
 #gif de 1 ao 5
 @bot.command()
 async def gif(ctx):
-    await ctx.send("https://tenor.com/view/marceline-bubbline-adventure-time-princess-bubblegum-best-friends-gif-14213958")
+    await ctx.send("https://klipy.com/gifs/planeta")
 
 @bot.command()
 async def gif2(ctx):
-    await ctx.send("https://klipy.com/gifs/spongebob-spongebob-squarepants-249")
-
+    await ctx.send("https://klipy.com/gifs/you-are-my-world-8")
 @bot.command()
 async def gif3(ctx):
-    await ctx.send("https://klipy.com/gifs/snoopy-dance-celebrate")
+    await ctx.send("https://klipy.com/gifs/stop-suffocating-earthgif")
 
 @bot.command()
 async def gif4(ctx):
-    await ctx.send("https://klipy.com/gifs/spider-man-x-men-97")
+    await ctx.send("https://klipy.com/gifs/air-pollution-Qc6")
 
 @bot.command()
 async def gif5(ctx):
-    await ctx.send("https://klipy.com/gifs/x-men-97-23")
+    await ctx.send("https://klipy.com/gifs/pollution-3")
 
 
 #emoji de 1 ao 5
 @bot.command()
 async def emoji1(ctx):
-    await ctx.send("🎮")
+    await ctx.send("🌎")
 
 @bot.command()
 async def emoji2(ctx):
-    await ctx.send("🕹️")
+    await ctx.send("🏭")
 
 @bot.command()
 async def emoji3(ctx):
-    await ctx.send("👾")
+    await ctx.send("⛈️")
 
 @bot.command()
 async def emoji4(ctx):
-    await ctx.send("🎧")
+    await ctx.send("☀️")
 
 @bot.command()
 async def emoji5(ctx):
-    await ctx.send("🎸")
+    await ctx.send("💦")
+
+
+bot.run('')
